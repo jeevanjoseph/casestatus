@@ -5,7 +5,6 @@ from lxml import html
 from requests.sessions import session
 
 
-# range(2190329135, 2190329171)
 def checkCaseStatus(session, receipt_number):
     data = { 'data':'changeLocale',
                  'appReceiptNum':receipt_number,
@@ -44,16 +43,12 @@ receipt_numbers = []
 
 # Setup args parser
 parser = argparse.ArgumentParser(description='Check some USCIS cases.')
-
-
 parser.add_argument('-n','--receipt-number', dest='receipt_numbers', metavar='receipt_numbers', nargs='+',
                     help='enter the receipt numbers to check for')
 
 parser.add_argument('-r','--range', dest='receipt_range', metavar='range', nargs=2,
                     help='enter the receipt number range')
-
 args = parser.parse_args()
-print(args.receipt_range)
 
 if args.receipt_range:
     validateRange(args.receipt_range[0], args.receipt_range[1])
@@ -66,12 +61,14 @@ if(args.receipt_numbers):
 if receipt_numbers:
     with requests.Session() as s:
         res = s.get('https://egov.uscis.gov/casestatus/landing.do')
-        for receipt in receipt_numbers:
+        for receipt in sorted(set(receipt_numbers)):
             # cprint('res: {}'.format(res.text))
             if validateReceiptNum(receipt):
                 status = checkCaseStatus(session=s, receipt_number=str(receipt))
             else :
                 status = 'Skipped'
             print (receipt+' - '+status)
+else:
+    print('No valid receipt numbers')
 
 
