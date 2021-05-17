@@ -4,6 +4,27 @@ import re
 from lxml import html
 from requests.sessions import session
 
+# Print iterations progress
+def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
+    """
+    Call in a loop to create terminal progress bar
+    @params:
+        iteration   - Required  : current iteration (Int)
+        total       - Required  : total iterations (Int)
+        prefix      - Optional  : prefix string (Str)
+        suffix      - Optional  : suffix string (Str)
+        decimals    - Optional  : positive number of decimals in percent complete (Int)
+        length      - Optional  : character length of bar (Int)
+        fill        - Optional  : bar fill character (Str)
+        printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
+    """
+    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+    filledLength = int(length * iteration // total)
+    bar = fill * filledLength + '-' * (length - filledLength)
+    print(f'\r{prefix} |{bar}| {percent}% {suffix}', end = printEnd)
+    # Print New Line on Complete
+    if iteration == total: 
+        print()
 
 def checkCaseStatus(session, receipt_number):
     data = {'data': 'changeLocale',
@@ -48,6 +69,22 @@ def getReceiptRange(r_start, r_end):
             receipt_range.append(center+str(num))
     return receipt_range
 
+def processReceipts(receipt_numbers):
+    with requests.Session() as s:
+        res = s.get('https://egov.uscis.gov/casestatus/landing.do')
+        status_dict = {}
+        printProgressBar(0, len(receipt_numbers), prefix = 'Progress:', suffix = 'Complete', length = 50)
+        for i,receipt in enumerate(sorted(set(receipt_numbers))):
+            # cprint('res: {}'.format(res.text))
+            if validateReceiptNum(receipt):
+                status = checkCaseStatus(
+                    session=s, receipt_number=str(receipt))
+            else:
+                status = 'Skipped'
+            status_dict[receipt] = status
+            printProgressBar(i + 1, len(receipt_numbers), prefix = 'Progress:', suffix = 'Complete', length = 50)
+        return status_dict
+
 
 # Setup vars
 receipt_numbers = []
@@ -70,15 +107,9 @@ if(args.receipt_numbers):
     receipt_numbers.extend(args.receipt_numbers)
 
 if receipt_numbers:
-    with requests.Session() as s:
-        res = s.get('https://egov.uscis.gov/casestatus/landing.do')
-        for receipt in sorted(set(receipt_numbers)):
-            # cprint('res: {}'.format(res.text))
-            if validateReceiptNum(receipt):
-                status = checkCaseStatus(
-                    session=s, receipt_number=str(receipt))
-            else:
-                status = 'Skipped'
-            print(receipt+' - '+status)
+    caseStatus = processReceipts(receipt_numbers)
+    print("{:<15} {:<35} ".format('Receipt Number', 'Status'))
+    for receipt_num,status in caseStatus.items():
+        print("{:<15} {:<35} ".format(receipt_num, status))
 else:
     print('No valid receipt numbers')
