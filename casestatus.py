@@ -68,7 +68,7 @@ def getReceiptRange(r_start, r_end):
             for num in range(rangeStart, rangeEnd+1):
                 receipt_range.append(center+str(num))
     except Exception:
-        print("parsing range failed")
+        print("Invalid range. Check receipt numbers.")
     return receipt_range
 
 def processReceipts(receipt_numbers):
@@ -82,7 +82,7 @@ def processReceipts(receipt_numbers):
                 status = checkCaseStatus(
                     session=s, receipt_number=str(receipt))
             else:
-                status = 'Skipped'
+                status = 'Invalid Receipt Number'
             status_dict[receipt] = status
             printProgressBar(i + 1, len(receipt_numbers), prefix = 'Progress:', suffix = 'Complete', length = 50)
         return status_dict
