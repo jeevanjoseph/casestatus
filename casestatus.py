@@ -92,11 +92,11 @@ def processReceipts(receipt_numbers):
 receipt_numbers = []
 
 # Setup args parser
-parser = argparse.ArgumentParser(description='Check some USCIS cases.')
+parser = argparse.ArgumentParser(description='Check status of USCIS cases.')
 parser.add_argument('receipt_numbers', metavar='receipt_numbers', nargs='*',
                     help='enter the receipt numbers to check for')
 
-parser.add_argument('-r', '--range', dest='receipt_range', metavar='range', nargs=2,
+parser.add_argument('-r', '--range', dest='receipt_range', metavar=('receipt_num_start', 'receipt_num_end'), nargs=2,
                     help='enter the receipt number range')
 args = parser.parse_args()
 
