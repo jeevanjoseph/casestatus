@@ -57,16 +57,18 @@ def getReceiptRange(r_start, r_end):
         r'(EAC|IOE|LIN|MSC|NBC|NSC|SRC|TSC|VSC|WAC|YSC)([0-9]{2})([0-9]{3})([0-9]{5})', r_start, re.M | re.I)
     matchRangeEnd = re.match(
         r'(EAC|IOE|LIN|MSC|NBC|NSC|SRC|TSC|VSC|WAC|YSC)([0-9]{2})([0-9]{3})([0-9]{5})', r_end, re.M | re.I)
-
-    center = matchRangeStart.group(1)
-    center_end = matchRangeStart.group(1)
-    rangeStart = int(matchRangeStart.group(
-        2)+matchRangeStart.group(3)+matchRangeStart.group(4))
-    rangeEnd = int(matchRangeEnd.group(
-        2)+matchRangeEnd.group(3)+matchRangeEnd.group(4))
-    if((rangeStart <= rangeEnd) & (center == center_end)):
-        for num in range(rangeStart, rangeEnd+1):
-            receipt_range.append(center+str(num))
+    try:
+        center = matchRangeStart.group(1)
+        center_end = matchRangeStart.group(1)
+        rangeStart = int(matchRangeStart.group(
+            2)+matchRangeStart.group(3)+matchRangeStart.group(4))
+        rangeEnd = int(matchRangeEnd.group(
+            2)+matchRangeEnd.group(3)+matchRangeEnd.group(4))
+        if((rangeStart <= rangeEnd) & (center == center_end)):
+            for num in range(rangeStart, rangeEnd+1):
+                receipt_range.append(center+str(num))
+    except Exception:
+        print("parsing range failed")
     return receipt_range
 
 def processReceipts(receipt_numbers):
@@ -91,7 +93,7 @@ receipt_numbers = []
 
 # Setup args parser
 parser = argparse.ArgumentParser(description='Check some USCIS cases.')
-parser.add_argument('-n', '--receipt-number', dest='receipt_numbers', metavar='receipt_numbers', nargs='+',
+parser.add_argument('receipt_numbers', metavar='receipt_numbers', nargs='*',
                     help='enter the receipt numbers to check for')
 
 parser.add_argument('-r', '--range', dest='receipt_range', metavar='range', nargs=2,
