@@ -115,3 +115,4 @@ if receipt_numbers:
         print("{:<15} {:<35} ".format(receipt_num, status))
 else:
     print('No valid receipt numbers')
+    parser.print_help()
