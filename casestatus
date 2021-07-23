@@ -28,6 +28,9 @@ def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, 
     if iteration == total: 
         print()
 
+#
+# Given an http session, make a request to USCIS and grab the status text based on XPath
+#
 def checkCaseStatus(session, receipt_number):
     data = {'data': 'changeLocale',
             'appReceiptNum': receipt_number,
@@ -39,13 +42,17 @@ def checkCaseStatus(session, receipt_number):
         '/html/body/div[2]/form/div/div[1]/div/div/div[2]/div[3]/h1/text()')
     return status[0]
 
-
+#
+# Validate the given receipt number based on the pattern of known processing center codes and Receipt Number format 
+#
 def validateReceiptNum(r_num):
     matchObj = re.match(
         r'(EAC|IOE|LIN|MSC|NBC|NSC|SRC|TSC|VSC|WAC|YSC)([0-9]{2})([0-9]{3})([0-9]{5})', r_num, re.M | re.I)
     return True if matchObj else False
 
-
+#
+# Validate that ranges are sensible if the query provides a range of reciept numbers.
+#
 def validateRange(r_start, r_end):
     if validateReceiptNum(r_start) & validateReceiptNum(r_end):
         return True
@@ -113,6 +120,7 @@ if(args.receipt_numbers):
 if receipt_numbers:
     caseStatus = processReceipts(receipt_numbers)
     print("{:<15} {:<35} ".format('Receipt Number', 'Status'))
+    print("{:<15} {:<35} ".format('---------------', '-------------------------------------'))
     for receipt_num,status in caseStatus.items():
         print("{:<15} {:<35} ".format(receipt_num, status))
 else:

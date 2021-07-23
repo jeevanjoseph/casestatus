@@ -3,6 +3,25 @@
 A simple command line tool to check the staus of a [USCIS](https://egov.uscis.gov/casestatus/landing.do) case.
 Created to make the process of querying for a set of recipt numbers a bit less cumbersome.
 
+## Install
+
+casestatus is written in python, and you need python3 to run it. To install, Clone the repo
+
+```
+git clone https://github.com/jeevanjoseph/casestatus.git && cd casestatus
+```
+
+install the dependencies
+
+```
+pip install -r requirements.txt
+```
+or 
+```
+pip3 install -r requirements.txt
+```
+Done.
+
 ## Usage
 
 ```
