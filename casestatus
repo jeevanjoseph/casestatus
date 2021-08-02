@@ -32,15 +32,59 @@ def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, 
 # Given an http session, make a request to USCIS and grab the status text based on XPath
 #
 def checkCaseStatus(session, receipt_number):
+    caseInfo = {}
     data = {'data': 'changeLocale',
             'appReceiptNum': receipt_number,
             'initCaseSearch': 'CHECK STATUS'}
     page = session.post(
         'https://egov.uscis.gov/casestatus/mycasestatus.do', data=data)
     tree = html.fromstring(page.content)
+    detail = extractCaseDetail(tree)
+    headline = extractHeadline(tree)
+    
+    caseInfo['status'] = headline
+    caseInfo['lastAction'] = inferLastAction(detail)
+    caseInfo['formNumber'] = inferFormNumber(detail)
+    caseInfo['stage'] = inferStatus(headline)
+    return caseInfo
+
+def extractHeadline(tree):
     status = tree.xpath(
         '/html/body/div[2]/form/div/div[1]/div/div/div[2]/div[3]/h1/text()')
     return status[0]
+
+def extractCaseDetail(tree):
+    detail = tree.xpath(
+        '/html/body/div[2]/form/div/div[1]/div/div/div[2]/div[3]/p/text()')
+    return detail[0]
+
+def inferLastAction(detail):
+    matchDate = re.search(r'((January|February|March|April|May|June|July|August|September|October|November|December)[ ][0-9]{2}[, ]{2}[0-9]{4})', detail)
+    return  matchDate.group(0) if matchDate else '---'
+
+def inferFormNumber(detail):
+    matchForm = re.search(r'(Form I-[0-9]{3})', detail)
+    return matchForm.group(0) if matchForm else '---'
+
+def inferStatus(detail):
+    approved = re.search(r'(Approved|Card)', detail)
+    if approved:
+        return 'Approved'
+    else:
+        interview = re.search(r'(Interview)', detail)
+        if interview:
+            return "Interview"
+        else:
+            rfe = re.search(r'(Evidence)', detail)
+            if rfe:
+                return "RFE"
+            else:
+                closed = re.search(r'(Closed|Denied)', detail)
+                if closed:
+                    return "Closed"
+                else:
+                    return "In Progress"
+
 
 #
 # Validate the given receipt number based on the pattern of known processing center codes and Receipt Number format 
@@ -100,14 +144,14 @@ def processReceipts(receipt_numbers):
 # Setup vars
 receipt_numbers = []
 
-# Setup args parser
-parser = argparse.ArgumentParser(description='Check status of USCIS cases.')
-parser.add_argument('receipt_numbers', metavar='receipt_numbers', nargs='*',
+# Setup args argParser
+argParser = argparse.ArgumentParser(description='Check status of USCIS cases.')
+argParser.add_argument('receipt_numbers', metavar='receipt_numbers', nargs='*',
                     help='enter the receipt numbers to check for')
 
-parser.add_argument('-r', '--range', dest='receipt_range', metavar=('receipt_num_start', 'receipt_num_end'), nargs=2,
+argParser.add_argument('-r', '--range', dest='receipt_range', metavar=('receipt_num_start', 'receipt_num_end'), nargs=2,
                     help='enter the receipt number range')
-args = parser.parse_args()
+args = argParser.parse_args()
 
 if args.receipt_range:
     validateRange(args.receipt_range[0], args.receipt_range[1])
@@ -119,10 +163,10 @@ if(args.receipt_numbers):
 
 if receipt_numbers:
     caseStatus = processReceipts(receipt_numbers)
-    print("{:<15} {:<35} ".format('Receipt Number', 'Status'))
-    print("{:<15} {:<35} ".format('---------------', '-------------------------------------'))
+    print("{:<15} {:<50} {:<25} {:<10} {:<10}".format('Receipt Number', 'Status', 'Stage', 'Last Action', 'Case Type'))
+    print("{:<15} {:<50} {:<25} {:<10} {:<10}".format('---------------', '-----------------------------------------------','----------------','--------------------------------','----------'))
     for receipt_num,status in caseStatus.items():
-        print("{:<15} {:<35} ".format(receipt_num, status))
+        print("{:<15} {:<50} {:<25} {:<10} {:<10}".format(receipt_num, status['status'], status['stage'], status['lastAction'], status['formNumber']))
 else:
     print('No valid receipt numbers')
-    parser.print_help()
+    argParser.print_help()
