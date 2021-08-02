@@ -163,10 +163,10 @@ if(args.receipt_numbers):
 
 if receipt_numbers:
     caseStatus = processReceipts(receipt_numbers)
-    print("{:<15} {:<50} {:<25} {:<10} {:<10}".format('Receipt Number', 'Status', 'Stage', 'Last Action', 'Case Type'))
-    print("{:<15} {:<50} {:<25} {:<10} {:<10}".format('---------------', '-----------------------------------------------','----------------','--------------------------------','----------'))
+    print("{:<15} {:<50} {:<15} {:<25} {:<10}".format('Receipt Number', 'Status', 'Stage', 'Last Action', 'Case Type'))
+    print("{:<15} {:<50} {:<15} {:<25} {:<10}".format('---------------', '-----------------------------------------------','----------------','--------------------------------','----------'))
     for receipt_num,status in caseStatus.items():
-        print("{:<15} {:<50} {:<25} {:<10} {:<10}".format(receipt_num, status['status'], status['stage'], status['lastAction'], status['formNumber']))
+        print("{:<15} {:<50} {:<15} {:<25} {:<10}".format(receipt_num, status['status'], status['stage'], status['lastAction'], status['formNumber']))
 else:
     print('No valid receipt numbers')
     argParser.print_help()

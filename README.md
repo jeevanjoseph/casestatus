@@ -3,7 +3,23 @@
 A simple command line tool to check the staus of a [USCIS](https://egov.uscis.gov/casestatus/landing.do) case.
 Created to make the process of querying for a set of recipt numbers a bit less cumbersome.
 
-## Install
+## Run it
+
+Use the docker image to run with ease :
+
+```
+docker run -it --rm casestatus:edge ./casestatus -r MSC2190329165 MSC2190329170
+```
+## Build it
+
+To build the image: 
+
+```
+docker build -t casestatus:edge .
+```
+
+
+## Local Install
 
 casestatus is written in python, and you need python3 to run it. To install, Clone the repo
 
