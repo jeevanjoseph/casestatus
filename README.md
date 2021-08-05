@@ -8,7 +8,7 @@ Created to make the process of querying for a set of recipt numbers a bit less c
 Use the docker image to run with ease :
 
 ```
-docker run -it --rm casestatus:edge ./casestatus -r MSC2190329165 MSC2190329170
+docker run -it --rm ghcr.io/jeevanjoseph/casestatus:main casestatus -r MSC2190329165 MSC2190329170
 ```
 ## Build it
 
