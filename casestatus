@@ -59,7 +59,7 @@ def extractCaseDetail(tree):
     return detail[0]
 
 def inferLastAction(detail):
-    matchDate = re.search(r'((January|February|March|April|May|June|July|August|September|October|November|December)[ ][0-9]{2}[, ]{2}[0-9]{4})', detail)
+    matchDate = re.search(r'((January|February|March|April|May|June|July|August|September|October|November|December)[ ][0-9]{1,2}[, ]{2}[0-9]{4})', detail)
     return  matchDate.group(0) if matchDate else '---'
 
 def inferFormNumber(detail):
