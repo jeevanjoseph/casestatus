@@ -1,5 +1,7 @@
 # casestatus
 
+[![Docker Image](https://github.com/jeevanjoseph/casestatus/actions/workflows/publish-image.yaml/badge.svg?branch=main&event=push)](https://github.com/jeevanjoseph/casestatus/actions/workflows/publish-image.yaml)
+
 A simple command line tool to check the staus of a [USCIS](https://egov.uscis.gov/casestatus/landing.do) case.
 Created to make the process of querying for a set of recipt numbers a bit less cumbersome.
 
